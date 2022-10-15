@@ -13,7 +13,8 @@ namespace SLZ.MarrowEditor
             SPAWNABLE_CRATE,
             LEVEL_CRATE,
             AVATAR_CRATE,
-            VFX_CRATE
+            VFX_CRATE,
+            FLASK
         }
 
         public Barcode barcode = Barcode.EmptyBarcode();
@@ -106,6 +107,8 @@ namespace SLZ.MarrowEditor
                     return typeof(AvatarCrate);
                 case CrateType.VFX_CRATE:
                     return typeof(VFXCrate);
+                case CrateType.FLASK:
+                    return typeof(Flask);
                 default:
                     return null;
             }
@@ -129,6 +132,10 @@ namespace SLZ.MarrowEditor
             {
                 return CrateType.VFX_CRATE;
             }
+            else if (type == typeof(Flask))
+            {
+                return CrateType.FLASK;
+            }
             return CrateType.SPAWNABLE_CRATE;
         }
 
@@ -149,6 +156,9 @@ namespace SLZ.MarrowEditor
 
                 crate = ScriptableObject.CreateInstance<VFXCrate>();
                 assetTypeCache[typeof(VFXCrate)] = crate.AssetType;
+
+                crate = ScriptableObject.CreateInstance<Flask>();
+                assetTypeCache[typeof(Flask)] = crate.AssetType;
             }
 
             if (assetTypeCache.TryGetValue(type, out var assetType))
@@ -276,6 +286,8 @@ namespace SLZ.MarrowEditor
             if (generateBarcode)
             {
                 tempCrate = Crate.CreateCrate(GetCrateType(crateType), pallet, crateTitle, null);
+                if (tempCrate == null)
+                    Debug.Log("Temp crate is null");
                 barcode = new Barcode(tempCrate.Barcode);
             }
 

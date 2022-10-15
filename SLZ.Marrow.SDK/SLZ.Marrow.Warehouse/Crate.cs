@@ -187,7 +187,7 @@ namespace SLZ.Marrow.Warehouse
         public static Crate CreateCrate(System.Type type, Pallet pallet, string title, MarrowAsset marrowAsset, bool generateBarcode = true)
         {
             Crate crate = null;
-            if (type == typeof(SpawnableCrate) || type == typeof(LevelCrate) || type == typeof(AvatarCrate) || type == typeof(VFXCrate))
+            if (type == typeof(SpawnableCrate) || type == typeof(LevelCrate) || type == typeof(AvatarCrate) || type == typeof(VFXCrate) || type == typeof(Flask))
             {
                 crate = (Crate)ScriptableObject.CreateInstance(type);
                 crate.Title = title;
