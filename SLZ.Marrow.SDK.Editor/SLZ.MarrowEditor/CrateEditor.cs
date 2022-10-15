@@ -103,6 +103,11 @@ namespace SLZ.MarrowEditor
 
             serializedObject.Update();
 
+            if (assetReferenceProperty == null)
+            {
+                Debug.Log("Problem A");
+            }
+
             if (!string.IsNullOrEmpty(AssetReferenceDisplayName))
                 EditorGUILayout.PropertyField(assetReferenceProperty, new GUIContent(AssetReferenceDisplayName));
 

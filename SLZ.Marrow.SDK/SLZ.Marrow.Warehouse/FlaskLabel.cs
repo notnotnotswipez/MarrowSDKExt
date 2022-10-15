@@ -8,14 +8,14 @@ using UnityEditor;
 
 namespace SLZ.Marrow.Warehouse
 {
-    public class FlaskInfo : ScriptableObject
+    public class FlaskLabel : ScriptableObject
     {
         public Type[] elixirs;
 
         [MenuItem("Stress Level Zero/Alchemy/Create Flask Label Based on Open Scenes")]
         public static void CreateFlaskInfo()
         {
-            FlaskInfo info = CreateInstance<FlaskInfo>();
+            FlaskLabel info = CreateInstance<FlaskLabel>();
             info.elixirs = Elixir.GetAllElixirsFromScene();
             AssetDatabase.CreateAsset(info, "Assets/FlaskInfo.asset");
             EditorUtility.SetDirty(info);

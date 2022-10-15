@@ -9,13 +9,24 @@ using UnityEditor.SceneManagement;
 
 namespace SLZ.Marrow.Warehouse
 {
-    public class Flask : Crate
+    public class Flask : CrateT<FlaskLabel>
     {
-        public FlaskInfo flaskInfo;
+        [FormerlySerializedAs("_assetReference")]
+        [SerializeField]
+        private MarrowAsset _mainAsset;
 
         public override System.Type AssetType
         {
-            get => typeof(FlaskInfo);
+            get => typeof(FlaskLabel);
+        }
+
+        public override MarrowAsset MainAsset {
+            get => base.MainAsset;
+            set
+            {
+                base.MainAsset = value;
+                _mainAsset = value;
+            }
         }
     }
 }
