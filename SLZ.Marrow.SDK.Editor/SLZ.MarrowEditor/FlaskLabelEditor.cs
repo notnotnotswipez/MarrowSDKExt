@@ -30,14 +30,14 @@ public class FlaskLabelEditor : Editor
             EditorGUILayout.LabelField("Info is null");
             return;
         }
-        if (info.elixirs == null)
+        if (info.Elixirs == null)
         {
             EditorGUILayout.LabelField("Elixir is null");
             return;
         }
 
         Type toRemove = null;
-        foreach (Type type in info.elixirs)
+        foreach (Type type in info.Elixirs)
         {
             if (type == null)
                 continue;
@@ -50,7 +50,7 @@ public class FlaskLabelEditor : Editor
             }
             EditorGUILayout.EndHorizontal();
         }
-        EditorGUILayout.LabelField($"There are ({info.elixirs.Length}) Elixirs total.");
+        EditorGUILayout.LabelField($"There are ({info.Elixirs.Length}) Elixirs total.");
         EditorGUILayout.Space(10);
         EditorGUILayout.LabelField($"Add an Elixir", EditorStyles.boldLabel);
         EditorGUILayout.BeginHorizontal();
@@ -81,7 +81,7 @@ public class FlaskLabelEditor : Editor
         if (toRemove != null || toAdd.Count != 0)
         {
             List<Type> types = new List<Type>();
-            types.AddRange(info.elixirs);
+            types.AddRange(info.Elixirs);
             if (toRemove != null)
                 types.Remove(toRemove);
 
@@ -95,7 +95,7 @@ public class FlaskLabelEditor : Editor
                 toAdd.Clear();
             }
 
-            info.elixirs = types.ToArray();
+            info.Elixirs = types.ToArray();
 
             EditorUtility.SetDirty(info);
             AssetDatabase.SaveAssets();

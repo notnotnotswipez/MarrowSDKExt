@@ -10,17 +10,54 @@ namespace SLZ.Marrow.Warehouse
 {
     public class FlaskLabel : ScriptableObject
     {
-        public Type[] elixirs;
+        public Type[] Elixirs {
+            get {
+                if (_elixirCache == null)
+                {
+                    List<Type> types = new List<Type>();
+                    if (elixirNames != null)
+                    {
+                        foreach (string typeName in elixirNames)
+                        {
+                            types.Add(Type.GetType(typeName));
+                        }
+                        _elixirCache = types.ToArray();
+                    }
+                    else _elixirCache = new Type[0];
+                }
+                return _elixirCache;
+            }
+            set
+            {
+                _elixirCache = value;
+                
+                List<string> fullNames = new List<string>();
+                foreach (Type types in _elixirCache)
+                {
+                    if (types == null)
+                        continue;
+
+                    fullNames.Add(types.AssemblyQualifiedName);
+                }
+                elixirNames = fullNames.ToArray();
+            }
+        }
+
+        private Type[] _elixirCache;
+        public string[] elixirNames;
 
         [MenuItem("Stress Level Zero/Alchemy/Create Flask Label Based on Open Scenes")]
         public static void CreateFlaskInfo()
         {
-            FlaskLabel info = CreateInstance<FlaskLabel>();
-            info.elixirs = Elixir.GetAllElixirsFromScene();
-            AssetDatabase.CreateAsset(info, "Assets/FlaskInfo.asset");
-            EditorUtility.SetDirty(info);
+            FlaskLabel asset = ScriptableObject.CreateInstance<FlaskLabel>();
+            
+            asset.Elixirs = Elixir.GetAllElixirsFromScene();
+            AssetDatabase.CreateAsset(asset, "Assets/NewScripableObject.asset");
             AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
+
+            EditorUtility.FocusProjectWindow();
+
+            Selection.activeObject = asset;
         }
 
         
