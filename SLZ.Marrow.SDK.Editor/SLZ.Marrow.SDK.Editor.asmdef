@@ -12,7 +12,8 @@
         "UniTask.Editor",
         "UniTask.Linq",
         "Unity.XR.Management",
-        "Unity.XR.Management.Editor"
+        "Unity.XR.Management.Editor",
+        "MSBuildForUnity"
     ],
     "includePlatforms": [
         "Editor"

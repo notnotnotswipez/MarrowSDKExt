@@ -12,6 +12,7 @@ using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 using SLZ.Marrow;
 using SLZ.Marrow.Warehouse;
+using Maranara.Marrow;
 
 namespace SLZ.MarrowEditor
 {
@@ -383,6 +384,8 @@ namespace SLZ.MarrowEditor
             CurrentPallet = pallet;
 
             AddressablesRuntimeProperties.ClearCachedPropertyValues();
+
+            ElixirMixer.ExportFlasks(pallet);
 
             AddressableAssetSettings.BuildPlayerContent();
         }

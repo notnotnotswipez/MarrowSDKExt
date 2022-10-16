@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Reflection;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -45,21 +46,21 @@ namespace SLZ.Marrow.Warehouse
 
         private Type[] _elixirCache;
         public string[] elixirNames;
-
+#if UNITY_EDITOR
         [MenuItem("Stress Level Zero/Alchemy/Create Flask Label Based on Open Scenes")]
         public static void CreateFlaskInfo()
         {
             FlaskLabel asset = ScriptableObject.CreateInstance<FlaskLabel>();
             
             asset.Elixirs = Elixir.GetAllElixirsFromScene();
-            AssetDatabase.CreateAsset(asset, "Assets/NewScripableObject.asset");
+            AssetDatabase.CreateAsset(asset, $"Assets/Flask Label {SceneManager.GetActiveScene().name}.asset");
             AssetDatabase.SaveAssets();
 
             EditorUtility.FocusProjectWindow();
 
             Selection.activeObject = asset;
         }
+#endif
 
-        
     }
 }
