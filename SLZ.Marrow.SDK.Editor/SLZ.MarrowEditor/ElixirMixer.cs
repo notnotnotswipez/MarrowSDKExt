@@ -51,14 +51,12 @@ namespace Maranara.Marrow
         {
             foreach (var gamePath in ModBuilder.GamePathDictionary)
             {
-                //Debug.Log(gamePath.Value);
                 if (gamePath.Value.Contains("steamapps"))
                 {
                     BONELAB_DIR = gamePath.Value;
                     break;
                 } 
             }
-            //Debug.Log(BONELAB_DIR);
 
             List<Type> exportedTypes = new List<Type>();
 
@@ -85,8 +83,6 @@ namespace Maranara.Marrow
                     Debug.Log("Found duplicate script, skipping");
                     continue;
                 }
-                /*if (type.FullName == typeof(CustomMapSaveModifier).FullName)
-                    continue;*/
 
                 Debug.Log("Searching for elixir of " + type.Name);
                 string scriptPath = scriptFiles.Single((f) => Path.GetFileNameWithoutExtension(f) == type.Name);

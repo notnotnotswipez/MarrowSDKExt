@@ -137,7 +137,7 @@ namespace SLZ.Marrow.Warehouse
             var jsonCrateArray = new JArray();
             foreach (var crate in Crates)
             {
-                if (crate != null)
+                if (crate != null && !crate.GetType().IsAssignableFrom(typeof(Flask)))
                 {
                     jsonCrateArray.Add(store.PackReference(crate));
                 }

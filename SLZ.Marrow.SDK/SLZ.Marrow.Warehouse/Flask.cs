@@ -21,12 +21,17 @@ namespace SLZ.Marrow.Warehouse
         }
 
         public override MarrowAsset MainAsset {
-            get => base.MainAsset;
+            get => _mainAsset;
             set
             {
                 base.MainAsset = value;
                 _mainAsset = value;
             }
+        }
+
+        public override void Pack(ObjectStore store, JObject json)
+        {
+            //base.Pack(store, json);
         }
     }
 }

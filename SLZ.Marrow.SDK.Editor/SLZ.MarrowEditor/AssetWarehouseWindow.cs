@@ -301,6 +301,7 @@ namespace SLZ.MarrowEditor
                             treeViewAW.showAvatars = GUILayout.Toggle(treeViewAW.showAvatars, new GUIContent(treeViewAW.avatarIcon, "Show Avatars"), MarrowGUIStyles.DefaultButton);
                             treeViewAW.showLevels = GUILayout.Toggle(treeViewAW.showLevels, new GUIContent(treeViewAW.levelIcon, "Show Levels"), MarrowGUIStyles.DefaultButton);
                             treeViewAW.showSpawnables = GUILayout.Toggle(treeViewAW.showSpawnables, new GUIContent(treeViewAW.spawnableIcon, "Show Spawnables"), MarrowGUIStyles.DefaultButton);
+                            treeViewAW.showFlasks = GUILayout.Toggle(treeViewAW.showFlasks, new GUIContent(treeViewAW.flaskIcon, "Show Flasks"), MarrowGUIStyles.DefaultButton);
                         }
 
                     }

@@ -117,16 +117,6 @@ namespace SLZ.Marrow.Warehouse
                     packedAssetsArray.Add(packedAssetJObject);
             }
             json.Add(new JProperty("packedAssets", packedAssetsArray));
-
-
-
-
-
-
-
-
-
-
         }
 
         public virtual void Unpack(ObjectStore store, ObjectId objectId)
@@ -175,14 +165,7 @@ namespace SLZ.Marrow.Warehouse
                     Tags.Add(tagValue.ToObject<string>());
                 }
             }
-
-
-
-
-
         }
-
-
 
         public static Crate CreateCrate(System.Type type, Pallet pallet, string title, MarrowAsset marrowAsset, bool generateBarcode = true)
         {

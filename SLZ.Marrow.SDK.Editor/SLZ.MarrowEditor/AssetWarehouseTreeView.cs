@@ -24,10 +24,12 @@ namespace SLZ.MarrowEditor
         public bool showAvatars = true;
         public bool showLevels = true;
         public bool showSpawnables = true;
+        public bool showFlasks = true;
 
         public Texture2D palletIcon;
         public Texture2D avatarIcon;
         public Texture2D levelIcon;
+        public Texture2D flaskIcon;
         public Texture2D spawnableIcon;
 
         public Dictionary<string, bool> uniqueTags = new Dictionary<string, bool>();
@@ -91,6 +93,7 @@ namespace SLZ.MarrowEditor
                 List<Crate> avatars = new List<Crate>();
                 List<Crate> levels = new List<Crate>();
                 List<Crate> spawnables = new List<Crate>();
+                List<Crate> flasks = new List<Crate>();
 
                 for (int c = 0; c < pallets[p].Crates.Count; c++)
                 {
@@ -106,6 +109,10 @@ namespace SLZ.MarrowEditor
                     if (pallets[p].Crates[c].GetType() == typeof(SpawnableCrate))
                     {
                         spawnableIcon = AssetPreview.GetMiniThumbnail(pallets[p].Crates[c]);
+                    }
+                    if (pallets[p].Crates[c].GetType() == typeof(Flask))
+                    {
+                        flaskIcon = AssetPreview.GetMiniThumbnail(pallets[p].Crates[c]);
                     }
 
 
@@ -133,6 +140,11 @@ namespace SLZ.MarrowEditor
                                 spawnables.Add(pallets[p].Crates[c]);
                             }
 
+                            if (showFlasks && pallets[p].Crates[c].GetType() == typeof(Flask))
+                            {
+                                flasks.Add(pallets[p].Crates[c]);
+                            }
+
                         }
                         else
                         {
@@ -155,6 +167,11 @@ namespace SLZ.MarrowEditor
                                     {
                                         spawnables.Add(pallets[p].Crates[c]);
                                     }
+
+                                    if (showFlasks && pallets[p].Crates[c].GetType() == typeof(Flask) && !flasks.Contains(pallets[p].Crates[c]))
+                                    {
+                                        flasks.Add(pallets[p].Crates[c]);
+                                    }
                                 }
 
                             }
@@ -163,7 +180,7 @@ namespace SLZ.MarrowEditor
                     }
                 }
 
-                if (avatars.Count == 0 && levels.Count == 0 && spawnables.Count == 0 && !Search(pallets[p].Title, "title") && !Search(pallets[p].Barcode, "barcode"))
+                if (avatars.Count == 0 && levels.Count == 0 && spawnables.Count == 0 && flasks.Count == 0 && !Search(pallets[p].Title, "title") && !Search(pallets[p].Barcode, "barcode"))
                     continue;
 
 
@@ -181,11 +198,13 @@ namespace SLZ.MarrowEditor
                 avatars = avatars.OrderBy(crate => crate.Title).ToList();
                 levels = levels.OrderBy(crate => crate.Title).ToList();
                 spawnables = spawnables.OrderBy(crate => crate.Title).ToList();
+                flasks = flasks.OrderBy(crate => crate.Title).ToList();
 
 
                 SetupCrateType(avatars, allItems, ref id, typeof(AvatarCrate));
                 SetupCrateType(levels, allItems, ref id, typeof(LevelCrate));
                 SetupCrateType(spawnables, allItems, ref id, typeof(SpawnableCrate));
+                SetupCrateType(flasks, allItems, ref id, typeof(Flask));
             }
 
             SetupParentsAndChildrenFromDepths(root, allItems);
