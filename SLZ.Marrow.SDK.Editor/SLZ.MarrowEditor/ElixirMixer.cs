@@ -13,6 +13,7 @@ using Microsoft.Build.Unity;
 using Microsoft.CodeAnalysis;
 using SLZ.MarrowEditor;
 using SLZ.Marrow;
+using System.Text.RegularExpressions;
 
 namespace Maranara.Marrow
 {
@@ -40,7 +41,9 @@ namespace Maranara.Marrow
 
             foreach (Flask flask in flasks)
             {
-                ExportElixirs(MarrowSDK.SanitizeName(flask.Title), flaskPath, flask);
+                string title = MarrowSDK.SanitizeName(flask.Title);
+                title = Regex.Replace(title, @"\s+", "");
+                ExportElixirs(title, flaskPath, flask);
             }
         }
 
