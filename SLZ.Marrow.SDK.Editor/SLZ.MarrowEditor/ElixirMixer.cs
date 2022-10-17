@@ -20,7 +20,7 @@ namespace Maranara.Marrow
     public static class ElixirMixer
     {
 
-        private static string BONELAB_DIR = null;
+        private static string ML_DIR = null;
         public static void ExportFlasks(Pallet pallet)
         {
             List<Flask> flasks = new List<Flask>();
@@ -43,28 +43,59 @@ namespace Maranara.Marrow
             {
                 string title = MarrowSDK.SanitizeName(flask.Title);
                 title = Regex.Replace(title, @"\s+", "");
-                ExportElixirs(title, flaskPath, flask);
+                bool success = ExportElixirs(title, flaskPath, flask);
+                if (!success)
+                    break;
             }
         }
 
-        public static void ExportElixirs(string title, string outputDirectory, Flask flask)
+        public static bool ExportElixirs(string title, string outputDirectory, Flask flask)
         {
-            if (string.IsNullOrEmpty(BONELAB_DIR))
+            if (string.IsNullOrEmpty(ML_DIR))
             {
-                Debug.Log($"Bonelab Game Directory is null... finding directory from ModBuilder");
-                foreach (var gamePath in ModBuilder.GamePathDictionary)
+                string gamePathSS = Path.Combine("Assets", MarrowSDK.EDITOR_ASSETS_FOLDER) + "\\gamePath.txt";
+                if (File.Exists(gamePathSS))
                 {
-                    if (gamePath.Value.Contains("steamapps"))
+                    ML_DIR = File.ReadAllText(gamePathSS);
+                } else
+                {
+                    if (EditorUtility.DisplayDialog("Help me out!", "Your MelonLoader directory isn't set. Can you select the MelonLoader.dll in BONELAB/MelonLoader?", "Sure thing"))
                     {
-                        Debug.Log($"Found directory containing steamapps: {gamePath.Value}");
-                        if (Directory.Exists(gamePath.Value))
+                        bool validFile = false;
+                        while (validFile == false)
                         {
-                            Debug.Log($"Found BONELAB_DIR candidate of {gamePath.Value}");
-                            BONELAB_DIR = gamePath.Value;
-                            break;
+                            string file = EditorUtility.OpenFilePanel("MelonLoader.dll", null, "dll");
+
+                            if (File.Exists(file))
+                            {
+                                string fileDir = Path.GetDirectoryName(file);
+                                Debug.Log(file);
+                                Debug.Log(fileDir);
+                                if (file.EndsWith("MelonLoader.dll") && Directory.Exists(fileDir) && fileDir.EndsWith("MelonLoader") && File.Exists(file))
+                                {
+                                    validFile = true;
+                                    ML_DIR = fileDir;
+                                    File.WriteAllText(gamePathSS, fileDir);
+                                }
+                            }
+
+                            if (validFile == false)
+                            {
+                                if (!EditorUtility.DisplayDialog("Sorry!", "This isn't a valid MelonLoader.dll file! Please try again.", "Sure thing"))
+                                {
+                                    EditorUtility.DisplayDialog("Wow...", "Fine, be that way. No Elixirs will export for now.", "Sure thing");
+                                    validFile = true;
+                                    return false;
+                                }
+                            }
                         }
-                        else continue;
                     }
+                    else
+                    {
+                        EditorUtility.DisplayDialog("Wow...", "Fine, be that way. No Elixirs will export for now.", "Sure thing");
+                        return false;
+                    }
+
                 }
             }
             
@@ -77,7 +108,7 @@ namespace Maranara.Marrow
             // not very proud of this but hey if it works it works
             string projTemplateDir = Path.Combine(Directory.GetParent(Application.dataPath).FullName, "BehaviourProjectTemplate");
 
-            XDocument csproj = XDocument.Parse(File.ReadAllText(Path.Combine(projTemplateDir, "CustomMonoBehaviour.csproj")).Replace("$safeprojectname$", title).Replace("$BONELAB_DIR$", BONELAB_DIR));
+            XDocument csproj = XDocument.Parse(File.ReadAllText(Path.Combine(projTemplateDir, "CustomMonoBehaviour.csproj")).Replace("$safeprojectname$", title).Replace("$BONELAB_DIR$", ML_DIR));
             XElement compile = csproj.Root.Elements().Single((e) => e.ToString().Contains("Compile"));
 
             var newScriptFile = File.ReadAllLines(Path.Combine(projTemplateDir, "CustomMonoBehaviour.cs")).ToList();
@@ -108,16 +139,19 @@ namespace Maranara.Marrow
                     ClassDeclarationSyntax rootClass = null;
 
                     // Add the IntPtr constructor for UnhollowerRuntimeLib
-                    ConstructorDeclarationSyntax ptrConstructor = SyntaxFactory.ConstructorDeclaration(type.Name).WithInitializer
+                    if (type.IsAssignableFrom(typeof(MonoBehaviour)))
+                    {
+                        ConstructorDeclarationSyntax ptrConstructor = SyntaxFactory.ConstructorDeclaration(type.Name).WithInitializer
                         (
                             ConstructorInitializer(SyntaxKind.BaseConstructorInitializer)
                                 .AddArgumentListArguments(Argument(IdentifierName("intPtr")))
                         ).WithBody(Block());
-                    ptrConstructor = ptrConstructor.AddParameterListParameters(Parameter(List<AttributeListSyntax>(), TokenList(), ParseTypeName("System.IntPtr"), Identifier("intPtr"), null));
-                    ptrConstructor = ptrConstructor.AddModifiers(Token(SyntaxKind.PublicKeyword));
-                    ptrConstructor = ptrConstructor.NormalizeWhitespace();
-                    rootClass = MixerLibs.UpdateMainClass(root, type.Name);
-                    root = root.ReplaceNode(rootClass, rootClass.AddMembers(ptrConstructor));
+                        ptrConstructor = ptrConstructor.AddParameterListParameters(Parameter(List<AttributeListSyntax>(), TokenList(), ParseTypeName("System.IntPtr"), Identifier("intPtr"), null));
+                        ptrConstructor = ptrConstructor.AddModifiers(Token(SyntaxKind.PublicKeyword));
+                        ptrConstructor = ptrConstructor.NormalizeWhitespace();
+                        rootClass = MixerLibs.UpdateMainClass(root, type.Name);
+                        root = root.ReplaceNode(rootClass, rootClass.AddMembers(ptrConstructor));
+                    }
 
                     // Remove all attributes using a rewriter class
                     root = new MixerLibs.AttributeRemoverRewriter().Visit(root).SyntaxTree.GetCompilationUnitRoot();
@@ -166,6 +200,7 @@ namespace Maranara.Marrow
 
                 File.Copy(Path.Combine(tempDir, "bin", "Debug", title + ".dll"), Path.Combine(outputDirectory, $"{title}.dll"));
                 Directory.Delete(tempDir, true);
+                return true;
 
             }
             catch (Exception e)
@@ -175,6 +210,7 @@ namespace Maranara.Marrow
                 Debug.Log(msbuild);
                 System.Diagnostics.Process.Start(msbuild);
                 throw e;
+                return false;
             }
         }
     }

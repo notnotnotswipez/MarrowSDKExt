@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 [CustomEditor(typeof(FlaskLabel))]
 public class FlaskLabelEditor : Editor
@@ -17,8 +18,10 @@ public class FlaskLabelEditor : Editor
         toAdd = new List<Type>();
     }
 
-    MonoBehaviour selectedMB;
+    Object selectedElixir;
+    Type selectedElixirType;
     List<Type> toAdd;
+    private bool notAnElixir;
     public override void OnInspectorGUI()
     {
         
@@ -55,27 +58,56 @@ public class FlaskLabelEditor : Editor
         EditorGUILayout.LabelField($"Add an Elixir", EditorStyles.boldLabel);
         EditorGUILayout.BeginHorizontal();
 
-        selectedMB = (MonoBehaviour)EditorGUILayout.ObjectField(selectedMB, typeof(MonoBehaviour), true);
-        
-        if (selectedMB != null)
+        Object newElixir = EditorGUILayout.ObjectField(selectedElixir, typeof(Object), true);
+        if (selectedElixir != newElixir)
         {
-            Elixir attribute = (Elixir)selectedMB.GetType().GetCustomAttribute(typeof(Elixir));
-            if (attribute == null)
+            selectedElixir = newElixir;
+            if (selectedElixir != null)
             {
-                EditorGUILayout.LabelField("THIS IS NOT AN ELIXIR!");
-            }
-            else if (GUILayout.Button("Add"))
+                Type elixirType = selectedElixir.GetType();
+
+                if (elixirType == typeof(MonoScript))
+                {
+                    MonoScript mono = (MonoScript)selectedElixir;
+                    Type monoClass = mono.GetClass();
+                    if (monoClass != null)
+                        elixirType = monoClass;
+                }
+
+                Elixir attribute = (Elixir)elixirType.GetCustomAttribute(typeof(Elixir));
+                if (attribute == null)
+                {
+                    notAnElixir = true;
+                    selectedElixirType = null;
+                }
+                else
+                {
+                    notAnElixir = false;
+                    selectedElixirType = elixirType;
+                }
+            } else
             {
-                toAdd.Add(selectedMB.GetType());
-                selectedMB = null;
+                notAnElixir = false;
+                selectedElixirType = null;
             }
         }
+
+        if (notAnElixir)
+        {
+            EditorGUILayout.LabelField("THIS IS NOT AN ELIXIR!");
+            selectedElixirType = null;
+        } else if (selectedElixir != null && GUILayout.Button("Add"))
+        {
+            toAdd.Add(selectedElixirType);
+            selectedElixir = null;
+        }
+
         EditorGUILayout.EndHorizontal();
 
         if (GUILayout.Button("Add All from Current Scene"))
         {
             toAdd.AddRange(Elixir.GetAllElixirsFromScene());
-            selectedMB = null;
+            selectedElixir = null;
         }
 
         if (toRemove != null || toAdd.Count != 0)
@@ -103,5 +135,12 @@ public class FlaskLabelEditor : Editor
         }
 
         serializedObject.ApplyModifiedProperties();
+    }
+
+    private void OnValidate()
+    {
+        notAnElixir = false;
+        selectedElixir = null;
+        selectedElixirType = null;
     }
 }
