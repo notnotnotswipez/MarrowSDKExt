@@ -20,7 +20,7 @@ namespace Maranara.Marrow
     public static class ElixirMixer
     {
 
-        private static string BONELAB_DIR = "S:\\SteamLibrary\\steamapps\\common\\BONELAB";
+        private static string BONELAB_DIR = null;
         public static void ExportFlasks(Pallet pallet)
         {
             List<Flask> flasks = new List<Flask>();
@@ -49,14 +49,25 @@ namespace Maranara.Marrow
 
         public static void ExportElixirs(string title, string outputDirectory, Flask flask)
         {
-            foreach (var gamePath in ModBuilder.GamePathDictionary)
+            if (string.IsNullOrEmpty(BONELAB_DIR))
             {
-                if (gamePath.Value.Contains("steamapps"))
+                Debug.Log($"Bonelab Game Directory is null... finding directory from ModBuilder");
+                foreach (var gamePath in ModBuilder.GamePathDictionary)
                 {
-                    BONELAB_DIR = gamePath.Value;
-                    break;
-                } 
+                    if (gamePath.Value.Contains("steamapps"))
+                    {
+                        Debug.Log($"Found directory containing steamapps: {gamePath.Value}");
+                        if (Directory.Exists(gamePath.Value))
+                        {
+                            Debug.Log($"Found BONELAB_DIR candidate of {gamePath.Value}");
+                            BONELAB_DIR = gamePath.Value;
+                            break;
+                        }
+                        else continue;
+                    }
+                }
             }
+            
 
             List<Type> exportedTypes = new List<Type>();
 
