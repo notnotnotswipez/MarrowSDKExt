@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using SLZ.Marrow.Warehouse;
+using Maranara.Marrow;
 
 namespace SLZ.MarrowEditor
 {
@@ -18,6 +19,14 @@ namespace SLZ.MarrowEditor
         public override void OnInspectorGUIBody()
         {
             base.OnInspectorGUIBody();
+            if (GUILayout.Button("Stir Flask"))
+            {
+                Flask flask = (Flask)target;
+
+                bool stirred = ElixirMixer.ExportElixirs("StirTest", Application.temporaryCachePath, flask);
+                if (stirred)
+                    EditorUtility.DisplayDialog("Yay", "Stirred successfully with no anomalies!", "Drink the grog");
+            }
             //EditorGUILayout.PropertyField(flaskInfoProperty);
         }
     }

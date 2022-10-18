@@ -25,3 +25,9 @@ public class Elixir : Attribute
     }
 
 }
+
+[AttributeUsage(AttributeTargets.Class)]
+public class DontAssignIntPtr : Attribute
+{
+    
+}

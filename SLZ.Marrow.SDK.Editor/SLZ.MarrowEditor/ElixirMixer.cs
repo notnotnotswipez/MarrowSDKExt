@@ -14,12 +14,13 @@ using Microsoft.CodeAnalysis;
 using SLZ.MarrowEditor;
 using SLZ.Marrow;
 using System.Text.RegularExpressions;
+using UnityEditor.Build;
+using System.Reflection;
 
 namespace Maranara.Marrow
 {
     public static class ElixirMixer
     {
-
         private static string ML_DIR = null;
         public static void ExportFlasks(Pallet pallet)
         {
@@ -127,7 +128,7 @@ namespace Maranara.Marrow
                 }
 
                 Debug.Log("Searching for elixir of " + type.Name);
-                string scriptPath = scriptFiles.Single((f) => Path.GetFileNameWithoutExtension(f) == type.Name);
+                string scriptPath = scriptFiles.FirstOrDefault((f) => Path.GetFileNameWithoutExtension(f) == type.Name);
                 if (!string.IsNullOrEmpty(scriptPath))
                 {
                     XElement newCompile = new XElement("Compile");
@@ -139,7 +140,13 @@ namespace Maranara.Marrow
                     ClassDeclarationSyntax rootClass = null;
 
                     // Add the IntPtr constructor for UnhollowerRuntimeLib
-                    if (type.IsAssignableFrom(typeof(MonoBehaviour)))
+                    bool inptrable = type.IsSubclassOf(typeof(MonoBehaviour)) || type.IsSubclassOf(typeof(ScriptableObject));
+
+                    DontAssignIntPtr dontAssignIntPtr = (DontAssignIntPtr)type.GetCustomAttribute(typeof(DontAssignIntPtr));
+                    if (dontAssignIntPtr != null)
+                        inptrable = false;
+
+                    if (inptrable)
                     {
                         ConstructorDeclarationSyntax ptrConstructor = SyntaxFactory.ConstructorDeclaration(type.Name).WithInitializer
                         (
@@ -159,6 +166,7 @@ namespace Maranara.Marrow
                     // Convert the final script to a string and switch UnityAction for System.Action
                     string finalScript = root.NormalizeWhitespace().ToFullString();
                     finalScript = finalScript.Replace("[Elixir]", "");
+                    finalScript = finalScript.Replace("[DontAssignIntPtr]", "");
                     finalScript = finalScript.Replace("new UnityAction", "new System.Action");
                     finalScript = finalScript.Replace("new UnityEngine.Events.UnityAction", "new System.Action");
                     // Swap StartCoroutine for MelonCoroutines.Start

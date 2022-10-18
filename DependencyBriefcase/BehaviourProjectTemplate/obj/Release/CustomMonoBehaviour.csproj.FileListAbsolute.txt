@@ -1,0 +1,2 @@
+S:\Projects\Unity\BONELAB SDK\Packages\MarrowSDK\DependencyBriefcase\BehaviourProjectTemplate\obj\Release\CustomMonoBehaviour.csproj.AssemblyReference.cache
+S:\Projects\Unity\BONELAB SDK\Packages\MarrowSDK\DependencyBriefcase\BehaviourProjectTemplate\obj\Release\CustomMonoBehaviour.csproj.CoreCompileInputs.cache

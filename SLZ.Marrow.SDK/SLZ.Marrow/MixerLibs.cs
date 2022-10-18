@@ -14,12 +14,12 @@ namespace Maranara.Marrow
         {
             return (ClassDeclarationSyntax)(root
     .ChildNodes().First().ChildNodes()
-    .SingleOrDefault((c)
+    .FirstOrDefault((c)
     => c.GetType() == typeof(ClassDeclarationSyntax)
     && ((ClassDeclarationSyntax)c).Identifier.ToString() == @class
     ) ?? root
     .ChildNodes()
-    .SingleOrDefault((c)
+    .FirstOrDefault((c)
     => c.GetType() == typeof(ClassDeclarationSyntax)
     && ((ClassDeclarationSyntax)c).Identifier.ToString() == @class
     ));
