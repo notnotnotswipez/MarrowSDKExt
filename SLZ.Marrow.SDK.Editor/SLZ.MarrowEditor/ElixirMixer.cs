@@ -54,53 +54,27 @@ namespace Maranara.Marrow
         {
             if (string.IsNullOrEmpty(ML_DIR))
             {
-                string gamePathSS = Path.Combine("Assets", MarrowSDK.EDITOR_ASSETS_FOLDER) + "\\gamePath.txt";
-                if (File.Exists(gamePathSS))
+                bool solved = false;
+                foreach (var gamePath in ModBuilder.GamePathDictionary)
                 {
-                    ML_DIR = File.ReadAllText(gamePathSS);
-                } else
-                {
-                    if (EditorUtility.DisplayDialog("Help me out!", "Your MelonLoader directory isn't set. Can you select the MelonLoader.dll in BONELAB/MelonLoader?", "Sure thing"))
+                    string gamePathSS = Path.Combine(gamePath.Value, "cauldronsave.txt");
+
+                    if (File.Exists(gamePathSS))
                     {
-                        bool validFile = false;
-                        while (validFile == false)
-                        {
-                            string file = EditorUtility.OpenFilePanel("MelonLoader.dll", null, "dll");
-
-                            if (File.Exists(file))
-                            {
-                                string fileDir = Path.GetDirectoryName(file);
-                                Debug.Log(file);
-                                Debug.Log(fileDir);
-                                if (file.EndsWith("MelonLoader.dll") && Directory.Exists(fileDir) && fileDir.EndsWith("MelonLoader") && File.Exists(file))
-                                {
-                                    validFile = true;
-                                    ML_DIR = fileDir;
-                                    File.WriteAllText(gamePathSS, fileDir);
-                                }
-                            }
-
-                            if (validFile == false)
-                            {
-                                if (!EditorUtility.DisplayDialog("Sorry!", "This isn't a valid MelonLoader.dll file! Please try again.", "Sure thing"))
-                                {
-                                    EditorUtility.DisplayDialog("Wow...", "Fine, be that way. No Elixirs will export for now.", "Sure thing");
-                                    validFile = true;
-                                    return false;
-                                }
-                            }
-                        }
+                        string mlPath = File.ReadAllText(gamePathSS);
+                        ML_DIR = mlPath.Replace("\n", "").Replace("\r", "");
+                        solved = true;
                     }
                     else
-                    {
-                        EditorUtility.DisplayDialog("Wow...", "Fine, be that way. No Elixirs will export for now.", "Sure thing");
-                        return false;
-                    }
+                        continue;
+                }
 
+                if (!solved)
+                {
+                    EditorUtility.DisplayDialog("Help me out!", "Your MelonLoader directory isn't set. Please launch BONELAB with the MarrowCauldron mod at least once.", "Sure thing");
+                    return false;
                 }
             }
-            
-
             List<Type> exportedTypes = new List<Type>();
 
             string tempDir = Path.Combine(Path.GetTempPath(), title);
