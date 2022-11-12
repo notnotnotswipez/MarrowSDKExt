@@ -11,20 +11,22 @@ namespace SLZ.Marrow.Warehouse
 {
     public class FlaskLabel : ScriptableObject
     {
-        public Type[] Elixirs {
+#if UNITY_EDITOR
+        public MonoScript[] Elixirs {
             get {
                 if (_elixirCache == null)
                 {
-                    List<Type> types = new List<Type>();
+                    List<MonoScript> types = new List<MonoScript>();
                     if (elixirNames != null)
                     {
                         foreach (string typeName in elixirNames)
                         {
-                            types.Add(Type.GetType(typeName));
+                            MonoScript script = AssetDatabase.LoadAssetAtPath<MonoScript>(typeName);
+                            types.Add(script);
                         }
                         _elixirCache = types.ToArray();
                     }
-                    else _elixirCache = new Type[0];
+                    else _elixirCache = new MonoScript[0];
                 }
                 return _elixirCache;
             }
@@ -33,25 +35,30 @@ namespace SLZ.Marrow.Warehouse
                 _elixirCache = value;
                 
                 List<string> fullNames = new List<string>();
-                foreach (Type types in _elixirCache)
+                foreach (MonoScript mscript in _elixirCache)
                 {
-                    if (types == null)
+                    if (mscript == null)
                         continue;
 
-                    fullNames.Add(types.AssemblyQualifiedName);
+                    fullNames.Add(AssetDatabase.GetAssetPath(mscript));
                 }
                 elixirNames = fullNames.ToArray();
             }
         }
 
-        private Type[] _elixirCache;
+        private MonoScript[] _elixirCache;
+#endif
         public string[] elixirNames;
+        public string[] elixirPaths;
+        public bool useDefaultIngredients = true;
+        public string[] ingredients;
+        public string[] additionalIngredients;
 #if UNITY_EDITOR
         [MenuItem("Stress Level Zero/Alchemy/Create Flask Label Based on Open Scenes")]
         public static void CreateFlaskInfo()
         {
             FlaskLabel asset = ScriptableObject.CreateInstance<FlaskLabel>();
-            
+            asset.useDefaultIngredients = true;
             asset.Elixirs = Elixir.GetAllElixirsFromScene();
             AssetDatabase.CreateAsset(asset, $"Assets/Flask Label {SceneManager.GetActiveScene().name}.asset");
             AssetDatabase.SaveAssets();

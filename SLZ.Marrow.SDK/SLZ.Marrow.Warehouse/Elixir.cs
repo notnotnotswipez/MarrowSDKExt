@@ -7,23 +7,24 @@ using UnityEngine;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
 public class Elixir : Attribute
 {
-    public static Type[] GetAllElixirsFromScene()
+#if UNITY_EDITOR
+    public static MonoScript[] GetAllElixirsFromScene()
     {
-        List<Type> elixirs = new List<Type>();
-        MonoBehaviour[] mbs = Resources.FindObjectsOfTypeAll<MonoBehaviour>();
-        foreach (MonoBehaviour mb in mbs)
+        List<MonoScript> elixirs = new List<MonoScript>();
+        MonoScript[] mbs = Resources.FindObjectsOfTypeAll<MonoScript>();
+        foreach (MonoScript mb in mbs)
         {
             Type type = mb.GetType();
             Elixir attribute = (Elixir)type.GetCustomAttribute(typeof(Elixir));
             if (attribute == null)
                 continue;
-            else elixirs.Add(type);
+            else elixirs.Add(mb);
 
             break;
         }
         return elixirs.ToArray();
     }
-
+#endif
 }
 
 [AttributeUsage(AttributeTargets.Class)]
