@@ -1,5 +1,7 @@
 # Extended Flask Marrow SDK thingamabob
-The doohickey
+The doohickey  
+If you want Flask support while using the extended SDK, replace the ExtendedSDK repo with this in the package manager.  
+
 Combines maranarasauce/MarrowSDK for Flask support, and Kairus101/MarrowSDKExt for extended SDK support
 Literally just merged these two repos and that's it
 
