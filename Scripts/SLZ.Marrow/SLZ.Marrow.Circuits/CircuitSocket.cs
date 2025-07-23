@@ -24,5 +24,11 @@ namespace SLZ.Marrow.Circuits
             {
             }
         }
+        
+        protected virtual void Reset()
+        {
+            TryGetComponent(out _servo);
+            TryGetComponent(out _rb);
+        }
     }
 }

@@ -24,6 +24,17 @@ namespace SLZ.Marrow.Circuits
         [SerializeField]
         protected AudioClip[] _depressClips;
 
+        public ButtonMode buttonMode
+        {
+            get
+            {
+                return _buttonMode;
+            }
+            set
+            {
+            }
+        }
+
         public enum ButtonMode
         {
             ClickUp,
